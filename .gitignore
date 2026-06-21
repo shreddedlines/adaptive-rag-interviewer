@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+frontend/node_modules/
+frontend/dist/
+
+# Storage: keep the folder but ignore data files
+storage/*.db
+storage/*.db-shm
+storage/*.db-wal
+storage/*.pdf
+storage/_latest_resume.pdf
+
+# Temp files
+check_db.py
+test_key.py

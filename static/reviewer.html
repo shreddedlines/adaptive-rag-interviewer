@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Reviewer Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#0f172a;min-height:100vh}
+header{background:#0f172a;color:#fff;padding:18px 32px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:17px;font-weight:700}
+header p{font-size:12px;color:#94a3b8;margin-top:2px}
+.container{max-width:1120px;margin:28px auto;padding:0 20px}
+.stats-row{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.stat-card{background:#fff;border-radius:12px;padding:16px 22px;flex:1;min-width:130px;border:1px solid #e2e8f0}
+.stat-card .val{font-size:26px;font-weight:800;color:#0f172a}
+.stat-card .lbl{font-size:11px;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden}
+.card-head{padding:14px 20px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+.card-head h2{font-size:14px;font-weight:700}
+.search{padding:7px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;width:220px;outline:none;font-family:inherit}
+.search:focus{border-color:#2563eb}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#f8fafc}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8fafc}
+.score-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.score-high{background:#dcfce7;color:#16a34a}
+.score-mid{background:#fef9c3;color:#ca8a04}
+.score-low{background:#fee2e2;color:#dc2626}
+.score-na{background:#f1f5f9;color:#94a3b8}
+.role-tag{display:inline-block;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:600;background:#eff6ff;color:#2563eb}
+.pdf-link{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;background:#0f172a;color:#fff;font-size:12px;font-weight:600;text-decoration:none;transition:opacity .15s}
+.pdf-link:hover{opacity:.75}
+.contact{font-size:12px;color:#475569;margin-top:2px}
+.contact a{color:#2563eb;text-decoration:none}
+.contact a:hover{text-decoration:underline}
+.empty{text-align:center;padding:48px;color:#94a3b8;font-size:14px}
+.back{font-size:12px;color:#94a3b8;text-decoration:none;border:1px solid #334155;padding:5px 12px;border-radius:7px;transition:all .15s}
+.back:hover{background:#1e293b;color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>&#128203; Reviewer Dashboard</h1>
+    <p>All interview sessions — candidate contact info &amp; scores</p>
+  </div>
+  <a class="back" href="/">&#8592; Back to app</a>
+</header>
+<div class="container">
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="val">…</div><div class="lbl">Loading</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <h2>Candidates</h2>
+      <input class="search" id="search" placeholder="Search name, email, role…" oninput="filter()"/>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Contact</th>
+          <th>Role</th>
+          <th>Score</th>
+          <th>Progress</th>
+          <th>Date</th>
+          <th>Report</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+<script>
+let rows=[];
+const ROLES={
+  'machine-learning':'ML Engineer','ml-ops':'MLOps','ai-engineer':'AI Engineer',
+  'deep-learning':'Deep Learning','computer-vision':'Computer Vision',
+  'nlp':'NLP Engineer','data-engineer':'Data Engineer','data-analyst':'Data Analyst'
+};
+async function load(){
+  try{
+    const res=await fetch('/api/reviewer/sessions');
+    rows=await res.json();
+    renderStats();
+    renderTable(rows);
+  }catch(e){
+    document.getElementById('tbody').innerHTML='<tr><td colspan="7" class="empty">Failed to load sessions.</td></tr>';
+  }
+}
+function renderStats(){
+  const total=rows.length;
+  const done=rows.filter(r=>r.status==='completed').length;
+  const withScore=rows.filter(r=>r.avg_score!=null);
+  const avgScore=withScore.length?Math.round(withScore.reduce((a,r)=>a+r.avg_score,0)/withScore.length):null;
+  const strong=withScore.filter(r=>r.avg_score>=75).length;
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-card"><div class="val">${total}</div><div class="lbl">Total Sessions</div></div>
+    <div class="stat-card"><div class="val">${done}</div><div class="lbl">Completed</div></div>
+    <div class="stat-card"><div class="val">${strong}</div><div class="lbl">Strong Candidates</div></div>
+    <div class="stat-card"><div class="val">${avgScore!=null?avgScore+'%':'—'}</div><div class="lbl">Avg Score</div></div>
+  `;
+}
+function scorePill(s){
+  if(s==null)return '<span class="score-pill score-na">—</span>';
+  const v=Math.round(s);
+  const cls=v>=75?'score-high':v>=50?'score-mid':'score-low';
+  return `<span class="score-pill ${cls}">${v}/100</span>`;
+}
+function fmt(dt){
+  if(!dt)return '—';
+  return new Date(dt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+function renderTable(data){
+  const tb=document.getElementById('tbody');
+  if(!data.length){tb.innerHTML='<tr><td colspan="7" class="empty">No sessions yet. Interviews will appear here once completed.</td></tr>';return;}
+  tb.innerHTML=data.map(r=>`<tr>
+    <td><div style="font-weight:600;font-size:14px">${r.candidate_name||'<span style="color:#94a3b8">Unknown</span>'}</div></td>
+    <td class="contact">
+      ${r.contact_email?`<a href="mailto:${r.contact_email}">${r.contact_email}</a>`:'<span style="color:#cbd5e1">No email</span>'}<br/>
+      ${r.contact_phone?`<a href="tel:${r.contact_phone}">${r.contact_phone}</a>`:'<span style="color:#cbd5e1">No phone</span>'}
+    </td>
+    <td><span class="role-tag">${ROLES[r.role]||r.role}</span></td>
+    <td>${scorePill(r.avg_score)}</td>
+    <td style="color:#64748b;font-size:12px">${r.answered||0} answered &middot; ${r.skipped||0} skipped</td>
+    <td style="color:#64748b;font-size:12px">${fmt(r.created_at)}</td>
+    <td>${r.status==='completed'
+      ?`<a class="pdf-link" href="/api/sessions/${r.id}/export" target="_blank" download>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-7 9H5v2h14v-2h-7z"/></svg>PDF</a>`
+      :'<span style="color:#94a3b8;font-size:12px">In progress</span>'}
+    </td>
+  </tr>`).join('');
+}
+function filter(){
+  const q=document.getElementById('search').value.toLowerCase();
+  renderTable(rows.filter(r=>
+    (r.candidate_name||'').toLowerCase().includes(q)||
+    (r.contact_email||'').toLowerCase().includes(q)||
+    (r.role||'').toLowerCase().includes(q)||
+    (r.contact_phone||'').includes(q)
+  ));
+}
+load();
+</script>
+</body>
+</html>

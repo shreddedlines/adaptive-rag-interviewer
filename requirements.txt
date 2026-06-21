@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+PyPDF2
+scikit-learn
+numpy
+google-generativeai
+reportlab
+python-dotenv
+jinja2
+aiofiles
