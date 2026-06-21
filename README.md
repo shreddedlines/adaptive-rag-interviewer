@@ -11,6 +11,7 @@ An AI-powered technical interview platform that screens candidates for AI, ML, a
 - [Key Features](#key-features)
 - [Supported Roles](#supported-roles)
 - [Architecture](#architecture)
+- [Key Design Decisions](#key-design-decisions)
 - [Project Structure](#project-structure)
 - [How It Works](#how-it-works)
 - [Tech Stack](#tech-stack)
@@ -103,6 +104,28 @@ FastAPI Application Server
 SQLite Database (storage/app.db)
 Knowledge Base PDFs (Knowledge Base Resources/)
 ```
+
+---
+
+## Key Design Decisions
+
+### Why RAG over fine-tuning
+Fine-tuning a model on domain content is expensive, slow to iterate, and risks hallucination when the training corpus changes. RAG keeps the knowledge base as external PDF documents that can be swapped or updated without retraining. The model receives grounded source material at inference time, which makes generated questions verifiably tied to real curriculum content.
+
+### TF-IDF for retrieval instead of vector embeddings
+TF-IDF was chosen over embedding-based retrieval (e.g., FAISS + sentence-transformers) for three reasons: zero external dependencies beyond scikit-learn, no GPU or embedding model required at runtime, and fast cold-start indexing on free-tier deployment platforms. For a knowledge base of this size (curated PDFs per role), TF-IDF provides sufficient retrieval quality without the infrastructure overhead of a vector database.
+
+### Three-tier adaptive difficulty
+A static question set treats all candidates equally regardless of their skill level. The adaptive engine starts freshers at foundational and experienced candidates at intermediate. After two answered questions, if the running average score crosses 75, the system escalates to advanced. If performance drops, it falls back to intermediate. This ensures strong candidates are challenged while weaker candidates are not overwhelmed.
+
+### Heuristic fallback scoring
+API rate limits and network issues are inevitable on free-tier hosting. Rather than failing the session or blocking the candidate, the system falls back to a local heuristic scorer that evaluates answers based on word count, technical term density, and detection of generic non-answers. This guarantees the interview flow is never interrupted.
+
+### SQLite as the database
+The application is designed as a self-contained, single-server deployment. SQLite eliminates the need for a separate database service, simplifies deployment on platforms like Render and Railway, and keeps the project portable. For production scale, the schema is designed to be directly portable to PostgreSQL with minimal changes.
+
+### Single-page application without a framework
+The frontend is built with vanilla HTML, CSS, and JavaScript rather than React or Vue. This removes the need for a build step, a Node.js toolchain, and a separate frontend deployment. The entire UI is served as static files by FastAPI, keeping the deployment footprint minimal and the architecture simple.
 
 ---
 
