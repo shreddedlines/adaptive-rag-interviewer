@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "generated_at": "2026-09-11T01:02:52",
+    "seed": 20260910,
+    "gemini_available": true,
+    "generator_under_test": "local-grounded (Gemini disabled for like-for-like comparison)",
+    "caveat": "Structural and diversity metrics only. Technical correctness, clarity, difficulty calibration and hallucination rate require expert human rating and are NOT reported."
+  },
+  "results": {
+    "questions_generated": 480,
+    "sessions_simulated": 96,
+    "grounding": {
+      "definition": "content words shared between the question text and the retrieved chunks, EXCLUDING the topic string and role label",
+      "questions_with_zero_grounded_words": 4,
+      "pct_with_zero_grounding": 0.8,
+      "mean_grounded_words": 2.763,
+      "max_grounded_words": 6,
+      "causal_grounding_count": 480,
+      "causal_grounding_pct": 100.0,
+      "causal_definition": "the question contains a concept term provably extracted from the retrieved chunks (not a static template word)"
+    },
+    "duplicates": {
+      "exact_duplicate_questions": 74,
+      "exact_duplicate_rate_pct": 15.4,
+      "distinct_questions": 406,
+      "most_repeated": [
+        {
+          "text": "You are applying python in a production system and have to account for programming language. What de",
+          "count": 5
+        },
+        {
+          "text": "You are applying pytorch in a production system and have to account for programming language. What d",
+          "count": 3
+        },
+        {
+          "text": "A system using python starts degrading and you suspect scientific computing is involved. How would y",
+          "count": 3
+        },
+        {
+          "text": "What is the role of recommend using when you are working with statistics, and what goes wrong if you",
+          "count": 3
+        },
+        {
+          "text": "How would you evaluate whether a pytorch solution is handling scientific computing correctly? Name t",
+          "count": 3
+        }
+      ]
+    },
+    "template_reuse": {
+      "distinct_template_signatures": 197,
+      "most_used_template": 16,
+      "mean_uses_per_template": 2.44
+    },
+    "topic_diversity": {
+      "distinct_topics_overall": 16,
+      "mean_duplicate_topics_per_session": 0,
+      "sessions_with_a_repeated_topic": 0
+    },
+    "difficulty_distribution": {
+      "intermediate": 416,
+      "foundational": 64
+    }
+  },
+  "sample_questions": [
+    "A system using information retrieval starts degrading and you suspect learning include is involved. How would you diagnose it, and what evidence would confirm your hypothesis?",
+    "You are applying python in a production system and have to account for bitcoin price. What design decision would you make first, and what metric would tell you it was right?",
+    "How would you evaluate whether a pytorch solution is handling bitcoin price correctly? Name the metric you would track and the failure mode you would expect.",
+    "A system using rag starts degrading and you suspect programming language is involved. How would you diagnose it, and what evidence would confirm your hypothesis?",
+    "You are applying llm in a production system and have to account for makes sense. What design decision would you make first, and what metric would tell you it was right?",
+    "What is the role of microsoft excel when you are working with classification, and what goes wrong if you ignore it?",
+    "In the context of sql, explain what jupyter notebook means and why it matters for a Machine Learning Engineer. Give a concrete example.",
+    "A system using python starts degrading and you suspect learning include is involved. How would you diagnose it, and what evidence would confirm your hypothesis?",
+    "You are applying pandas in a production system and have to account for microsoft excel. What design decision would you make first, and what metric would tell you it was right?",
+    "How would you evaluate whether a statistics solution is handling jupyter notebook correctly? Name the metric you would track and the failure mode you would expect.",
+    "You are applying classification in a production system and have to account for web application. What design decision would you make first, and what metric would tell you it was right?",
+    "How would you evaluate whether a feature engineering solution is handling learning libraries correctly? Name the metric you would track and the failure mode you would expect.",
+    "A system using python starts degrading and you suspect feature vector is involved. How would you diagnose it, and what evidence would confirm your hypothesis?",
+    "You are applying pytorch in a production system and have to account for programming language. What design decision would you make first, and what metric would tell you it was right?",
+    "How would you evaluate whether a numpy solution is handling bitcoin price correctly? Name the metric you would track and the failure mode you would expect."
+  ]
+}

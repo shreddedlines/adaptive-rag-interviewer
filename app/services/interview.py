@@ -1,4 +1,4 @@
-import random
+import hashlib
 import re
 import uuid
 from collections import Counter
@@ -63,79 +63,318 @@ def _difficulty(profile: ResumeProfile, answered_count: int, running_score: floa
     return "foundational"
 
 
+def _stable_offset(salt: str, modulo: int) -> int:
+    """Deterministic per-session offset.
+
+    Python's built-in hash() is randomised per process, so md5 is used to keep
+    the offset stable across restarts. Same salt -> same offset (determinism);
+    different sessions -> different starting point (cross-session diversity).
+    """
+    if modulo <= 0:
+        return 0
+    digest = hashlib.md5(salt.encode("utf-8")).hexdigest()
+    return int(digest[:8], 16) % modulo
+
+
 # ── Topic picker ───────────────────────────────────────────────────────────────
-def _topic(profile: ResumeProfile, sources: list[SourceChunk], used_topics: set[str]) -> str:
+def _topic(profile: ResumeProfile, sources: list[SourceChunk], used_topics: set[str],
+           salt: str = "") -> str:
+    """Pick an unused topic.
+
+    Deterministic GIVEN the session: the candidate list is rotated by a stable
+    hash of the session id, then consumed in order. The same session always
+    produces the same topic sequence, but two different sessions with the same
+    resume start at different points, which is what keeps questions varied
+    across candidates without reintroducing randomness.
+    """
     candidates = profile.domains + profile.technologies + profile.skills
-    available = [c for c in candidates if c not in used_topics]
+    seen: set[str] = set()
+    ordered = [c for c in candidates if not (c in seen or seen.add(c))]
+    if ordered and salt:
+        off = _stable_offset(salt, len(ordered))
+        ordered = ordered[off:] + ordered[:off]
+    available = [c for c in ordered if c not in used_topics]
     if available:
-        return random.choice(available)
+        return available[0]
     text = " ".join(source.text for source in sources).lower()
-    words = re.findall(r"[a-z][a-z\-]{4,}", text)
-    common = [word for word, _ in Counter(words).most_common(20)]
+    words = [w for w in re.findall(r"[a-z][a-z\-]{4,}", text) if w not in STOPWORDS]
+    common = [word for word, _ in Counter(words).most_common(30)]
     unused = [w for w in common if w not in used_topics]
     return unused[0] if unused else (common[0] if common else "machine learning fundamentals")
 
 
-# ── Question text — 3 difficulty tiers ────────────────────────────────────────
-def _question_text(
+# ── Concept extraction from retrieved chunks (grounds the local fallback) ─────
+#
+# Candidates are drawn from the KnowledgeIndex VOCABULARY rather than a raw regex
+# over the chunk text. That vocabulary is built with stop_words="english" and
+# ngram_range=(1, 2), which gives three properties for free:
+#   * English stopwords ("however", "although") are already excluded;
+#   * bigrams ("gradient descent", "neural networks") are first-class candidates;
+#   * OCR/extraction artifacts that never made the vocabulary are excluded.
+#
+# On top of that, candidates are filtered by corpus document frequency:
+#   * df above MAX_DF_FRACTION -> ubiquitous filler in this corpus ("machine"
+#     appears in 50% of chunks of an ML textbook, so it carries no information);
+#   * df below MIN_DF_FRACTION -> a one-off artifact rather than a real concept.
+# Mid-frequency terms are the informative ones. This is a standard IR heuristic,
+# not a hand-maintained blacklist.
+#
+# Bigrams are preferred over unigrams because a bigram is far more likely to be a
+# usable noun phrase when substituted into a question frame.
+
+# Used only by _concept_terms_fallback (the no-index path). The primary extractor
+# does not need this: it draws candidates from the index vocabulary, which already
+# has English stopwords removed.
+_CONCEPT_STOP = STOPWORDS | {
+    "which","were","also","such","using","used","would","could","many","most",
+    "other","some","only","then","they","them","these","those","there","where",
+    "when","while","been","being","into","over","under","between","about","each",
+    "more","less","than","very","much","well","make","made","take","given","give",
+    "example","examples","chapter","figure","section","page","book","learning",
+}
+
+MIN_DF_FRACTION = 0.01     # appear in at least 1% of chunks
+MAX_DF_FRACTION = 0.30     # appear in at most 30% of chunks
+BIGRAM_BONUS = 2.5         # strongly prefer multiword concepts
+MIN_UNIGRAM_CHARS = 5
+MIN_BIGRAMS_BEFORE_UNIGRAMS = 3   # unigrams only backfill a thin bigram list
+
+
+def _concept_terms(
+    sources: list[SourceChunk],
+    topic: str,
+    index: Any | None = None,
+    limit: int = 8,
+) -> list[str]:
+    """Salient concepts drawn from the RANKED retrieved chunks.
+
+    This is what makes the local fallback genuinely grounded: the phrase inserted
+    into the question comes from the retrieved material. Deterministic — scores
+    are a pure function of the chunks, with an alphabetical tiebreak.
+    """
+    if index is None or getattr(index, "matrix", None) is None or not sources:
+        return _concept_terms_fallback(sources, topic, limit)
+
+    import numpy as np
+
+    vec = index.vectorizer
+    n_docs = index.matrix.shape[0]
+    if n_docs == 0:
+        return _concept_terms_fallback(sources, topic, limit)
+
+    topic_tokens = {w for w in re.findall(r"[a-z]+", topic.lower())}
+    names = vec.get_feature_names_out()
+
+    # Rank-weighted TF-IDF over the retrieved chunks (rank 1 counts most).
+    rows = vec.transform([s.text or "" for s in sources])
+    weights = np.array([len(sources) - i for i in range(len(sources))], dtype=float)
+    combined = np.asarray(rows.multiply(weights[:, None]).sum(axis=0)).ravel()
+
+    # sklearn: idf = ln((1 + n) / (1 + df)) + 1  =>  df = (1 + n) / e^(idf - 1) - 1
+    idf = vec.idf_
+    df = (1.0 + n_docs) / np.exp(idf - 1.0) - 1.0
+    df_frac = df / n_docs
+
+    # Lowercased chunk text, used to verify a bigram is a real contiguous phrase.
+    # sklearn's tokenizer ignores sentence boundaries, so "languages. Machine"
+    # yields the bigram "languages machine", which is not a noun phrase. Requiring
+    # the literal phrase to occur in the source text removes these.
+    joined = " ".join((s_.text or "").lower() for s_ in sources)
+
+    bigrams: list[tuple[float, str]] = []
+    unigrams: list[tuple[float, str]] = []
+    for i in np.nonzero(combined)[0]:
+        frac = df_frac[i]
+        if frac < MIN_DF_FRACTION or frac > MAX_DF_FRACTION:
+            continue
+        term = names[i]
+        tokens = term.split()
+        if any(not t.isalpha() or len(t) < 3 for t in tokens):
+            continue
+        if topic_tokens & set(tokens):
+            continue
+        if len(tokens) > 1:
+            if term not in joined:          # boundary-spanning, not a real phrase
+                continue
+            # Reject verb/adverb-headed bigrams ("widely used", "called feature").
+            # English noun phrases are MODIFIER + HEAD NOUN, so an adverb (-ly) or
+            # past participle (-ed) in first position signals a verb phrase, which
+            # reads badly when substituted into a question frame. A trailing -ing
+            # is NOT rejected: "deep learning" / "gradient boosting" are gerund
+            # nouns and are exactly the concepts we want.
+            if tokens[0].endswith(("ly", "ed")):
+                continue
+            bigrams.append((float(combined[i]) * BIGRAM_BONUS, term))
+        else:
+            if len(term) < MIN_UNIGRAM_CHARS:
+                continue
+            unigrams.append((float(combined[i]), term))
+
+    # Deterministic ordering: score desc, then alphabetical.
+    bigrams.sort(key=lambda t: (-t[0], t[1]))
+    unigrams.sort(key=lambda t: (-t[0], t[1]))
+
+    # Multiword concepts substitute far more cleanly into a question frame, so
+    # unigrams are only used to backfill when too few bigrams survive.
+    terms = [t[1] for t in bigrams[:limit]]
+    if len(terms) < MIN_BIGRAMS_BEFORE_UNIGRAMS:
+        terms += [t[1] for t in unigrams[: limit - len(terms)]]
+    return terms or _concept_terms_fallback(sources, topic, limit)
+
+
+def _concept_terms_fallback(
+    sources: list[SourceChunk], topic: str, limit: int = 8
+) -> list[str]:
+    """Vocabulary-free path, used only when no index is available (e.g. a unit
+    test constructing sources by hand). Rank-weighted raw frequency."""
+    topic_tokens = {w for w in re.findall(r"[a-z]+", topic.lower())}
+    counts: Counter[str] = Counter()
+    for rank, src in enumerate(sources):
+        weight = len(sources) - rank
+        for word in re.findall(r"[a-z][a-z\-]{5,}", (src.text or "").lower()):
+            if word in _CONCEPT_STOP or word in topic_tokens:
+                continue
+            counts[word] += weight
+    ordered = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    return [w for w, _ in ordered[:limit]]
+
+
+# ── Question generation: Gemini (RAG-grounded) with a grounded local fallback ──
+def _local_question(
     role: str,
     topic: str,
     difficulty: str,
     sources: list[SourceChunk],
-    profile: "ResumeProfile | None" = None,
-) -> str:
-    # ── Try Gemini-generated question first (grounded in retrieved chunks) ──
+    used_signatures: set[str],
+    rotation: int,
+    salt: str = "",
+    index: Any | None = None,
+) -> dict[str, Any]:
+    """Deterministic local question generator grounded in the retrieved chunks.
+
+    This is NOT AI-generated and does not claim to be. It composes a question
+    from (a) the selected topic and (b) a salient concept term extracted from
+    the top-ranked retrieved chunks, using a fixed frame chosen by rotation.
+    Frames and concepts are both consumed deterministically, so a session does
+    not repeat itself and identical inputs give identical output.
+    """
+    role_label = ROLE_DESCRIPTIONS.get(role, role.replace("-", " ").title())
+    article = "an" if role_label[:1].upper() in "AEIOU" else "a"
+    concepts = _concept_terms(sources, topic, index=index) or ["evaluation"]
+    if salt and concepts:
+        off = _stable_offset(salt + topic, len(concepts))
+        concepts = concepts[off:] + concepts[:off]
+
+    frames: dict[str, list[str]] = {
+        "foundational": [
+            "In the context of {topic}, explain what {concept} means and why it matters for {article} {role_label}. Give a concrete example.",
+            "How would you explain the relationship between {topic} and {concept} to a junior engineer? Use an example from real work.",
+            "What is the role of {concept} when you are working with {topic}, and what goes wrong if you ignore it?",
+        ],
+        "intermediate": [
+            "You are applying {topic} in a production system and have to account for {concept}. What design decision would you make first, and what metric would tell you it was right?",
+            "How would you evaluate whether a {topic} solution is handling {concept} correctly? Name the metric you would track and the failure mode you would expect.",
+            "A system using {topic} starts degrading and you suspect {concept} is involved. How would you diagnose it, and what evidence would confirm your hypothesis?",
+        ],
+        "advanced": [
+            "A senior peer argues that your approach to {topic} breaks down because of {concept}. Defend or revise your design, naming the specific failure mode and the evidence you would use.",
+            "Describe how you would design an observability strategy for a production system built on {topic}, given that {concept} is the main risk. What signals would you monitor at each layer?",
+            "Under severe constraints - limited compute and a hard deadline - how would you deliver a {topic} solution that still handles {concept} correctly? Name the tradeoff you would accept and the one you would not.",
+        ],
+    }
+    tier = frames.get(difficulty, frames["foundational"])
+    frame_base = _stable_offset(salt + difficulty, len(tier)) if salt else 0
+
+    # Walk (frame, concept) pairs deterministically until we find an unused one.
+    chosen_text, chosen_concept = None, concepts[0]
+    for offset in range(len(tier) * len(concepts)):
+        idx = rotation + frame_base + offset
+        frame = tier[idx % len(tier)]
+        concept = concepts[(idx // len(tier)) % len(concepts)]
+        signature = f"{difficulty}|{topic}|{concept}|{idx % len(tier)}"
+        if signature in used_signatures:
+            continue
+        chosen_text = frame.format(topic=topic, concept=concept,
+                                   role_label=role_label, article=article)
+        chosen_concept = concept
+        used_signatures.add(signature)
+        break
+
+    if chosen_text is None:                      # every combination exhausted
+        frame = tier[rotation % len(tier)]
+        chosen_concept = concepts[rotation % len(concepts)]
+        chosen_text = frame.format(topic=topic, concept=chosen_concept,
+                                   role_label=role_label, article=article)
+
+    return {
+        "question": chosen_text,
+        "topic": topic,
+        "difficulty": difficulty,
+        "source_ids": [f"S{i}" for i in range(1, min(len(sources), 3) + 1)],
+        "expected_points": [
+            f"a working definition of {chosen_concept} in the context of {topic}",
+            "a concrete example, metric, or scenario rather than a definition alone",
+            "an explicit tradeoff or failure mode",
+        ],
+        "generator": "local-grounded",
+        "grounded_concept": chosen_concept,
+    }
+
+
+def _build_question(
+    role: str,
+    topic: str,
+    difficulty: str,
+    sources: list[SourceChunk],
+    profile: "ResumeProfile | None",
+    previous_questions: list[str],
+    used_signatures: set[str],
+    rotation: int,
+    salt: str = "",
+    index: Any | None = None,
+) -> dict[str, Any]:
+    """Try Gemini (grounded in the ranked chunks), else the grounded local generator."""
     from app.services.gemini_eval import generate_question
-    chunk_texts = [s.text for s in sources if s.text]
+
     background = ""
     if profile:
         background = ", ".join((profile.skills + profile.domains + profile.technologies)[:12])
-    gemini_q = generate_question(
+
+    chunk_dicts = [model_to_dict(s) for s in sources]
+    result = generate_question(
         role=role,
         topic=topic,
         difficulty=difficulty,
         candidate_background=background,
-        chunk_texts=chunk_texts,
+        chunks=chunk_dicts,
+        previous_questions=previous_questions,
     )
-    if gemini_q:
-        return gemini_q
+    if result:
+        # Reject a near-duplicate of anything already asked this session.
+        if not _is_duplicate(result["question"], previous_questions):
+            return result
+        print("[QGen] Gemini returned a near-duplicate; using local fallback")
 
-    # ── Fallback: hardcoded templates ────────────────────────────────
-    source_hint = sources[0].document if sources else "the knowledge base"
-    role_label = ROLE_DESCRIPTIONS.get(role, role.replace("-", " ").title())
+    return _local_question(role, topic, difficulty, sources, used_signatures,
+                           rotation, salt=salt, index=index)
 
-    foundational_prompts = [
-        f"For a {role_label} role, explain {topic} using an example from your own work. What tradeoffs would you watch for?",
-        f"How would you explain {topic} to a junior engineer joining your team for the first time?",
-        f"What is {topic} and why does it matter in a {role_label} context?",
-        f"Walk me through how you would get started with {topic} on a new project.",
-        f"What are the core concepts you need to understand before working with {topic}?",
-    ]
-    intermediate_prompts = [
-        f"You are applying {topic} in a production system. What design decision would you make first and what metric would validate it?",
-        f"Suppose a candidate mentions {topic} on their resume. What signals distinguish surface familiarity from practical depth?",
-        f"How would you evaluate whether a {topic}-based solution is working well, and what failure modes would you expect?",
-        f"Connect {topic} to the {role_label} role. What design decision would you make first, and what evidence would justify it?",
-        f"You listed {topic} as a strength. Walk through a real scenario where it mattered and what you'd do differently now.",
-        f"What are the most common misconceptions about {topic} you've seen in interviews or on the job?",
-    ]
-    advanced_prompts = [
-        f"Defend your preferred architectural approach to {topic} against a senior peer who argues the opposite. What's your strongest counter-evidence?",
-        f"Describe a real production failure related to {topic}. What broke, what was the blast radius, and what systemic fix did you put in place?",
-        f"Given severe constraints — limited compute, 48-hour deadline, legacy codebase — how would you still deliver a {topic}-based solution without cutting corners on reliability?",
-        f"How would you design an observability strategy specifically for a system built around {topic}? What signals would you monitor at each layer?",
-        f"If you were reviewing a junior engineer's PR that implements {topic} incorrectly, what are the top three issues you'd flag and how would you explain why each matters?",
-    ]
 
-    if difficulty == "advanced":
-        text = random.choice(advanced_prompts)
-        text += " Be specific: name the system, the metric, and the failure mode."
-    elif difficulty == "intermediate":
-        text = random.choice(intermediate_prompts)
-        text += " Include one concrete metric, system constraint, or edge case."
-    else:
-        text = random.choice(foundational_prompts)
-    return text
+def _is_duplicate(candidate: str, previous: list[str], threshold: float = 0.82) -> bool:
+    """Token-overlap duplicate check (Jaccard) against earlier questions."""
+    def toks(text: str) -> set[str]:
+        return {w for w in re.findall(r"[a-z][a-z\-]{2,}", text.lower())
+                if w not in STOPWORDS}
+    a = toks(candidate)
+    if not a:
+        return False
+    for prev in previous:
+        b = toks(prev)
+        if not b:
+            continue
+        union = a | b
+        if union and len(a & b) / len(union) >= threshold:
+            return True
+    return False
 
 
 # ── create_question ────────────────────────────────────────────────────────────
@@ -146,43 +385,83 @@ def create_question(
     previous_answer: str | None = None,
 ) -> Question:
     with db() as conn:
-        answered_count = conn.execute(
-            "SELECT COUNT(*) AS count FROM questions WHERE session_id = ?",
-            (session_id,),
-        ).fetchone()["count"]
-        used_topic_rows = conn.execute(
-            "SELECT topic FROM questions WHERE session_id = ?",
+        rows = conn.execute(
+            "SELECT topic, question_text, question_meta FROM questions "
+            "WHERE session_id = ? ORDER BY created_at ASC",
             (session_id,),
         ).fetchall()
-        used_topics: set[str] = {row["topic"] for row in used_topic_rows}
+    answered_count = len(rows)
+    used_topics: set[str] = {r["topic"] for r in rows}
+    previous_questions: list[str] = [r["question_text"] for r in rows]
+    used_signatures: set[str] = set()
+    for r in rows:
+        sig = decode_json(r["question_meta"], {}).get("frame_signature")
+        if sig:
+            used_signatures.add(sig)
 
     running_score = _get_running_score(session_id)
     query = build_query(role, profile, previous_answer)
+
+    # Retrieve a wider candidate pool, then keep the TOP-RANKED top_k.
+    # (Previously this was random.sample(pool, top_k), which discarded the
+    #  TF-IDF ranking and made downstream scoring non-reproducible.)
     fetch_k = max(settings.top_k * 3, 12)
-    all_sources = get_index(role).search(query, fetch_k)
-    sources = random.sample(all_sources, min(settings.top_k, len(all_sources))) if all_sources else []
-    topic = _topic(profile, sources, used_topics)
+    index = get_index(role)
+    all_sources = index.search(query, fetch_k)
+    sources = all_sources[: settings.top_k]
+
+    topic = _topic(profile, sources, used_topics, salt=session_id)
     difficulty = _difficulty(profile, answered_count, running_score)
+
+    built = _build_question(
+        role=role, topic=topic, difficulty=difficulty, sources=sources,
+        profile=profile, previous_questions=previous_questions,
+        used_signatures=used_signatures, rotation=answered_count,
+        salt=session_id, index=index,
+    )
+
     question_id = str(uuid.uuid4())
     question = Question(
         id=question_id,
-        text=_question_text(role, topic, difficulty, sources, profile),
-        topic=topic,
-        difficulty=difficulty,
+        text=built["question"],
+        topic=built.get("topic") or topic,
+        difficulty=built.get("difficulty") or difficulty,
         sources=sources,
     )
+
+    meta = {
+        "generator": built.get("generator", "unknown"),
+        "source_ids": built.get("source_ids", []),
+        "expected_points": built.get("expected_points", []),
+        "retrieval": {
+            "query": query[:400],
+            "fetch_k": fetch_k,
+            "kept_top_k": len(sources),
+            "ranks": [
+                {"rank": i, "document": s.document, "page": s.page, "score": s.score}
+                for i, s in enumerate(sources, 1)
+            ],
+        },
+    }
+    if built.get("grounded_concept"):
+        meta["grounded_concept"] = built["grounded_concept"]
+        meta["frame_signature"] = (
+            f"{question.difficulty}|{question.topic}|{built['grounded_concept']}"
+        )
 
     with db() as conn:
         conn.execute(
             """
             INSERT INTO questions (
-                id, session_id, question_text, topic, difficulty, source_chunks, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                id, session_id, question_text, topic, difficulty, source_chunks,
+                question_meta, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 question.id, session_id, question.text, question.topic,
                 question.difficulty,
                 encode_json([model_to_dict(s) for s in sources]),
+                encode_json(meta),
                 utc_now(),
             ),
         )
@@ -270,6 +549,7 @@ def skip_current_question(session_id: str) -> tuple[dict[str, Any], Question | N
             "score": 0, "level": "skipped",
             "grounding_terms": [], "relevance_terms": [], "technical_terms": [],
             "feedback": "Question was skipped.",
+            "evaluator": "skipped",
             "component_scores": {"length": 0, "relevance": 0, "grounding": 0, "technical": 0, "specificity": 0},
         }
         conn.execute(
@@ -308,28 +588,36 @@ def analyze_answer(
     hint_used: bool = False,
     role: str = "",
     difficulty: str = "foundational",
+    expected_points: list[str] | None = None,
 ) -> dict[str, Any]:
-    # ── Try Gemini first ───────────────────────────────────────────
+    """Evaluate an answer. Gemini is the primary evaluator and receives the
+    question PLUS the ranked reference context the question was built from, so
+    it can judge factual correctness. The local heuristic is the fallback and
+    is always labelled as such in the returned dict."""
+    # ── Primary: Gemini, grounded in the same context used to build the question
     gemini = evaluate_with_gemini(
         answer=answer,
         question_text=question_text,
         topic=topic,
         difficulty=difficulty,
         role=role,
+        chunks=sources,
+        expected_points=expected_points,
     )
     if gemini is not None:
         score = gemini["score"]
         if hint_used:
             score = min(score, 60)
         score = max(0, min(100, score))
-        # Synthesise radar component scores from Gemini's overall score
-        s = score / 100
+        dims = gemini.get("dimension_scores", {})
+        # Radar axes now come from Gemini's ACTUAL per-dimension judgements
+        # rather than being synthesised from the single overall score.
         component_scores = {
-            "length":      min(100, round(s * 100)),
-            "relevance":   min(100, round(s * 110)),
-            "grounding":   min(100, round(s * 95)),
-            "technical":   min(100, round(s * 105)),
-            "specificity": min(100, round(s * 90)),
+            "correctness":  dims.get("correctness", score),
+            "relevance":    dims.get("relevance", score),
+            "completeness": dims.get("completeness", score),
+            "reasoning":    dims.get("reasoning", score),
+            "grounding":    dims.get("grounding", score),
         }
         return {
             "score":            score,
@@ -337,11 +625,13 @@ def analyze_answer(
             "feedback":         gemini["feedback"],
             "strengths":        gemini.get("strengths", []),
             "gaps":             gemini.get("gaps", []),
+            "factual_errors":   gemini.get("factual_errors", []),
             "grounding_terms":  [],
             "relevance_terms":  [],
             "technical_terms":  [],
             "hint_used":        hint_used,
             "evaluator":        "gemini",
+            "dimension_scores": dims,
             "component_scores": component_scores,
         }
 
@@ -378,6 +668,7 @@ def analyze_answer(
             "technical_terms": [],
             "feedback": "Your answer appears to repeat the question. Please provide an original response.",
             "hint_used": hint_used,
+            "evaluator": "heuristic",
             "component_scores": {"length": 0, "relevance": 0, "grounding": 0, "technical": 0, "specificity": 0},
         }
 
@@ -433,6 +724,7 @@ def analyze_answer(
         "technical_terms":  sorted(technical_overlap)[:10],
         "feedback":         feedback_for_level(level),
         "hint_used":        hint_used,
+        "evaluator":        "heuristic",
         "component_scores": component_scores,
     }
 
@@ -467,11 +759,13 @@ def answer_current_question(
 
         hint_used = bool(question["hint_used"])
         sources   = decode_json(question["source_chunks"], [])
+        meta      = decode_json(question["question_meta"], {})
         analysis  = analyze_answer(
             answer, question["question_text"], question["topic"], sources,
             hint_used=hint_used,
             role=session["role"],
             difficulty=question["difficulty"],
+            expected_points=meta.get("expected_points"),
         )
 
         conn.execute(

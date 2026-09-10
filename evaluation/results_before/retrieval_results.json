@@ -1,0 +1,982 @@
+{
+  "meta": {
+    "seed": 20260910,
+    "generated_at": "2026-09-10T22:07:52",
+    "settings": {
+      "chunk_size": 900,
+      "chunk_overlap": 160,
+      "top_k": 5,
+      "max_pages_per_document": 20,
+      "max_document_mb": 25
+    },
+    "caveat": "Known-item retrieval measures index/vectorizer health. It is an UPPER BOUND on retrieval capability and says nothing about topical relevance for real interview queries, which would require human relevance labels."
+  },
+  "documents_on_disk": {
+    "ai-ml": [
+      "Machine Learning For Absolute Beginners.pdf",
+      "The Hundred-Page Machine Learning Book \u2014 Andriy Burkov.pdf"
+    ],
+    "data-science": [
+      "Introduction to Machine Learning with Python ( PDFDrive.com )-min.pdf",
+      "Master Machine Learning Algorithms \u2014 Jason Brownlee.pdf"
+    ],
+    "advanced-ml": [
+      "Artificial Intelligence, Machine Learning, and Deep Learning.pdf",
+      "Pattern Recognition and Machine Learning - Christopher Bishop.pdf"
+    ]
+  },
+  "per_collection": [
+    {
+      "collection": "ai-ml",
+      "corpus": {
+        "documents_indexed": 2,
+        "document_names": [
+          "Machine Learning For Absolute Beginners.pdf",
+          "The Hundred-Page Machine Learning Book \u2014 Andriy Burkov.pdf"
+        ],
+        "chunks": 100,
+        "pages_indexed_per_doc_cap": 20,
+        "chunk_size_setting": 900,
+        "chunk_overlap_setting": 160,
+        "chunk_len_chars_mean": 689.3,
+        "chunk_len_chars_median": 782.5,
+        "chunk_len_chars_min": 53,
+        "chunk_len_chars_max": 899,
+        "vocabulary_size": 6139,
+        "tfidf_matrix_shape": [
+          100,
+          6139
+        ],
+        "tfidf_density_pct": 1.6638,
+        "index_build_seconds": 0.066,
+        "front_matter_regex_hits": 2,
+        "front_matter_regex_pct": 2.0
+      },
+      "known_item_benchmark": {
+        "sentence": {
+          "queries_evaluated": 99,
+          "queries_skipped_no_usable_text": 1,
+          "recall_at_k": {
+            "@1": 0.8283,
+            "@3": 0.9495,
+            "@5": 0.9596,
+            "@10": 0.9899,
+            "@15": 1.0
+          },
+          "precision_at_k": {
+            "@1": 0.8283,
+            "@3": 0.3165,
+            "@5": 0.1919,
+            "@10": 0.099,
+            "@15": 0.0667
+          },
+          "mrr": 0.8943,
+          "ndcg_at_k": {
+            "@1": 0.8283,
+            "@3": 0.9034,
+            "@5": 0.9073,
+            "@10": 0.9174,
+            "@15": 0.9201
+          },
+          "median_rank_of_gold": 1,
+          "gold_outside_top_15": 0,
+          "mean_query_latency_ms": 3.03
+        },
+        "terms": {
+          "queries_evaluated": 100,
+          "queries_skipped_no_usable_text": 0,
+          "recall_at_k": {
+            "@1": 0.94,
+            "@3": 1.0,
+            "@5": 1.0,
+            "@10": 1.0,
+            "@15": 1.0
+          },
+          "precision_at_k": {
+            "@1": 0.94,
+            "@3": 0.3333,
+            "@5": 0.2,
+            "@10": 0.1,
+            "@15": 0.0667
+          },
+          "mrr": 0.9667,
+          "ndcg_at_k": {
+            "@1": 0.94,
+            "@3": 0.9752,
+            "@5": 0.9752,
+            "@10": 0.9752,
+            "@15": 0.9752
+          },
+          "median_rank_of_gold": 1.0,
+          "gold_outside_top_15": 0,
+          "mean_query_latency_ms": 3.71
+        }
+      }
+    },
+    {
+      "collection": "data-science",
+      "corpus": {
+        "documents_indexed": 2,
+        "document_names": [
+          "Introduction to Machine Learning with Python ( PDFDrive.com )-min.pdf",
+          "Master Machine Learning Algorithms \u2014 Jason Brownlee.pdf"
+        ],
+        "chunks": 113,
+        "pages_indexed_per_doc_cap": 20,
+        "chunk_size_setting": 900,
+        "chunk_overlap_setting": 160,
+        "chunk_len_chars_mean": 703.5,
+        "chunk_len_chars_median": 817,
+        "chunk_len_chars_min": 20,
+        "chunk_len_chars_max": 900,
+        "vocabulary_size": 6057,
+        "tfidf_matrix_shape": [
+          113,
+          6057
+        ],
+        "tfidf_density_pct": 1.4646,
+        "index_build_seconds": 0.063,
+        "front_matter_regex_hits": 17,
+        "front_matter_regex_pct": 15.0
+      },
+      "known_item_benchmark": {
+        "sentence": {
+          "queries_evaluated": 103,
+          "queries_skipped_no_usable_text": 10,
+          "recall_at_k": {
+            "@1": 0.8932,
+            "@3": 0.9903,
+            "@5": 1.0,
+            "@10": 1.0,
+            "@15": 1.0
+          },
+          "precision_at_k": {
+            "@1": 0.8932,
+            "@3": 0.3301,
+            "@5": 0.2,
+            "@10": 0.1,
+            "@15": 0.0667
+          },
+          "mrr": 0.9442,
+          "ndcg_at_k": {
+            "@1": 0.8932,
+            "@3": 0.9545,
+            "@5": 0.9586,
+            "@10": 0.9586,
+            "@15": 0.9586
+          },
+          "median_rank_of_gold": 1,
+          "gold_outside_top_15": 0,
+          "mean_query_latency_ms": 3.1
+        },
+        "terms": {
+          "queries_evaluated": 112,
+          "queries_skipped_no_usable_text": 1,
+          "recall_at_k": {
+            "@1": 0.9911,
+            "@3": 1.0,
+            "@5": 1.0,
+            "@10": 1.0,
+            "@15": 1.0
+          },
+          "precision_at_k": {
+            "@1": 0.9911,
+            "@3": 0.3333,
+            "@5": 0.2,
+            "@10": 0.1,
+            "@15": 0.0667
+          },
+          "mrr": 0.9955,
+          "ndcg_at_k": {
+            "@1": 0.9911,
+            "@3": 0.9967,
+            "@5": 0.9967,
+            "@10": 0.9967,
+            "@15": 0.9967
+          },
+          "median_rank_of_gold": 1.0,
+          "gold_outside_top_15": 0,
+          "mean_query_latency_ms": 3.49
+        }
+      }
+    },
+    {
+      "collection": "advanced-ml",
+      "corpus": {
+        "documents_indexed": 2,
+        "document_names": [
+          "Artificial Intelligence, Machine Learning, and Deep Learning.pdf",
+          "Pattern Recognition and Machine Learning - Christopher Bishop.pdf"
+        ],
+        "chunks": 87,
+        "pages_indexed_per_doc_cap": 20,
+        "chunk_size_setting": 900,
+        "chunk_overlap_setting": 160,
+        "chunk_len_chars_mean": 681.2,
+        "chunk_len_chars_median": 804,
+        "chunk_len_chars_min": 58,
+        "chunk_len_chars_max": 900,
+        "vocabulary_size": 5560,
+        "tfidf_matrix_shape": [
+          87,
+          5560
+        ],
+        "tfidf_density_pct": 1.695,
+        "index_build_seconds": 0.051,
+        "front_matter_regex_hits": 13,
+        "front_matter_regex_pct": 14.9
+      },
+      "known_item_benchmark": {
+        "sentence": {
+          "queries_evaluated": 83,
+          "queries_skipped_no_usable_text": 4,
+          "recall_at_k": {
+            "@1": 0.8795,
+            "@3": 1.0,
+            "@5": 1.0,
+            "@10": 1.0,
+            "@15": 1.0
+          },
+          "precision_at_k": {
+            "@1": 0.8795,
+            "@3": 0.3333,
+            "@5": 0.2,
+            "@10": 0.1,
+            "@15": 0.0667
+          },
+          "mrr": 0.9398,
+          "ndcg_at_k": {
+            "@1": 0.8795,
+            "@3": 0.9555,
+            "@5": 0.9555,
+            "@10": 0.9555,
+            "@15": 0.9555
+          },
+          "median_rank_of_gold": 1,
+          "gold_outside_top_15": 0,
+          "mean_query_latency_ms": 2.73
+        },
+        "terms": {
+          "queries_evaluated": 87,
+          "queries_skipped_no_usable_text": 0,
+          "recall_at_k": {
+            "@1": 0.9885,
+            "@3": 1.0,
+            "@5": 1.0,
+            "@10": 1.0,
+            "@15": 1.0
+          },
+          "precision_at_k": {
+            "@1": 0.9885,
+            "@3": 0.3333,
+            "@5": 0.2,
+            "@10": 0.1,
+            "@15": 0.0667
+          },
+          "mrr": 0.9943,
+          "ndcg_at_k": {
+            "@1": 0.9885,
+            "@3": 0.9958,
+            "@5": 0.9958,
+            "@10": 0.9958,
+            "@15": 0.9958
+          },
+          "median_rank_of_gold": 1,
+          "gold_outside_top_15": 0,
+          "mean_query_latency_ms": 3.49
+        }
+      }
+    }
+  ],
+  "micro_average": {
+    "sentence": {
+      "queries_evaluated": 285,
+      "recall_at_k": {
+        "@1": 0.8667,
+        "@3": 0.979,
+        "@5": 0.986,
+        "@10": 0.9965,
+        "@15": 1.0
+      },
+      "mrr": 0.9256,
+      "ndcg_at_k": {
+        "@1": 0.8667,
+        "@3": 0.937,
+        "@5": 0.9399,
+        "@10": 0.9434,
+        "@15": 0.9443
+      }
+    },
+    "terms": {
+      "queries_evaluated": 299,
+      "recall_at_k": {
+        "@1": 0.9733,
+        "@3": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@15": 1.0
+      },
+      "mrr": 0.9855,
+      "ndcg_at_k": {
+        "@1": 0.9733,
+        "@3": 0.9892,
+        "@5": 0.9892,
+        "@10": 0.9892,
+        "@15": 0.9892
+      }
+    }
+  },
+  "production_query_scores": {
+    "note": "Cosine similarity scores only. These are NOT accuracy and NOT recall. No relevance ground truth exists for production queries.",
+    "runs": [
+      {
+        "role": "machine-learning",
+        "collection": "ai-ml",
+        "profile": "experienced_ai",
+        "query_chars": 213,
+        "query_preview": "machine-learning interview experienced python pytorch rag llm nlp machine learning information retrieval model",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1278,
+        "top5_mean_cosine": 0.1161,
+        "top15_mean_cosine": 0.1031,
+        "min_cosine_in_topk": 0.0813,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          1,
+          3,
+          4,
+          5,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          14
+        ]
+      },
+      {
+        "role": "machine-learning",
+        "collection": "ai-ml",
+        "profile": "entry_data",
+        "query_chars": 122,
+        "query_preview": "machine-learning interview entry level sql python pandas statistics regression regression classification sql p",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1437,
+        "top5_mean_cosine": 0.1165,
+        "top15_mean_cosine": 0.0802,
+        "min_cosine_in_topk": 0.056,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          1,
+          3,
+          4,
+          5,
+          6,
+          7,
+          9,
+          11,
+          13,
+          14,
+          16,
+          20
+        ]
+      },
+      {
+        "role": "machine-learning",
+        "collection": "ai-ml",
+        "profile": "cv_engineer",
+        "query_chars": 155,
+        "query_preview": "machine-learning interview project heavy python pytorch computer vision deep learning numpy classification mod",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1218,
+        "top5_mean_cosine": 0.0954,
+        "top15_mean_cosine": 0.0761,
+        "min_cosine_in_topk": 0.0604,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          1,
+          3,
+          4,
+          5,
+          7,
+          8,
+          9,
+          10,
+          11,
+          14
+        ]
+      },
+      {
+        "role": "ml-ops",
+        "collection": "data-science",
+        "profile": "experienced_ai",
+        "query_chars": 203,
+        "query_preview": "ml-ops interview experienced python pytorch rag llm nlp machine learning information retrieval model evaluatio",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1269,
+        "top5_mean_cosine": 0.1131,
+        "top15_mean_cosine": 0.0853,
+        "min_cosine_in_topk": 0.0615,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          4,
+          5,
+          6,
+          7,
+          9,
+          10,
+          13,
+          16,
+          18,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "ml-ops",
+        "collection": "data-science",
+        "profile": "entry_data",
+        "query_chars": 112,
+        "query_preview": "ml-ops interview entry level sql python pandas statistics regression regression classification sql python pand",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1787,
+        "top5_mean_cosine": 0.1457,
+        "top15_mean_cosine": 0.0967,
+        "min_cosine_in_topk": 0.0495,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          5,
+          6,
+          14,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "ml-ops",
+        "collection": "data-science",
+        "profile": "cv_engineer",
+        "query_chars": 145,
+        "query_preview": "ml-ops interview project heavy python pytorch computer vision deep learning numpy classification model evaluat",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.161,
+        "top5_mean_cosine": 0.1208,
+        "top15_mean_cosine": 0.0855,
+        "min_cosine_in_topk": 0.035,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          5,
+          6,
+          7,
+          9,
+          10,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "ai-engineer",
+        "collection": "ai-ml",
+        "profile": "experienced_ai",
+        "query_chars": 208,
+        "query_preview": "ai-engineer interview experienced python pytorch rag llm nlp machine learning information retrieval model eval",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1407,
+        "top5_mean_cosine": 0.1035,
+        "top15_mean_cosine": 0.0796,
+        "min_cosine_in_topk": 0.058,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          12,
+          13,
+          16
+        ]
+      },
+      {
+        "role": "ai-engineer",
+        "collection": "ai-ml",
+        "profile": "entry_data",
+        "query_chars": 117,
+        "query_preview": "ai-engineer interview entry level sql python pandas statistics regression regression classification sql python",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1286,
+        "top5_mean_cosine": 0.0942,
+        "top15_mean_cosine": 0.06,
+        "min_cosine_in_topk": 0.0346,
+        "distinct_source_docs_in_top15": 1,
+        "pages_in_top15": [
+          4,
+          5,
+          6,
+          7,
+          9,
+          12,
+          13,
+          16,
+          20
+        ]
+      },
+      {
+        "role": "ai-engineer",
+        "collection": "ai-ml",
+        "profile": "cv_engineer",
+        "query_chars": 150,
+        "query_preview": "ai-engineer interview project heavy python pytorch computer vision deep learning numpy classification model ev",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.0809,
+        "top5_mean_cosine": 0.0739,
+        "top15_mean_cosine": 0.0541,
+        "min_cosine_in_topk": 0.0381,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          4,
+          5,
+          6,
+          7,
+          9,
+          10,
+          12,
+          13,
+          19
+        ]
+      },
+      {
+        "role": "deep-learning",
+        "collection": "advanced-ml",
+        "profile": "experienced_ai",
+        "query_chars": 210,
+        "query_preview": "deep-learning interview experienced python pytorch rag llm nlp machine learning information retrieval model ev",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.2144,
+        "top5_mean_cosine": 0.1541,
+        "top15_mean_cosine": 0.1103,
+        "min_cosine_in_topk": 0.0718,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          2,
+          4,
+          5,
+          11,
+          12,
+          13,
+          14,
+          16,
+          17,
+          18,
+          20
+        ]
+      },
+      {
+        "role": "deep-learning",
+        "collection": "advanced-ml",
+        "profile": "entry_data",
+        "query_chars": 119,
+        "query_preview": "deep-learning interview entry level sql python pandas statistics regression regression classification sql pyth",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.3097,
+        "top5_mean_cosine": 0.1897,
+        "top15_mean_cosine": 0.1167,
+        "min_cosine_in_topk": 0.0516,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          2,
+          4,
+          11,
+          14,
+          15,
+          16,
+          17,
+          18,
+          20
+        ]
+      },
+      {
+        "role": "deep-learning",
+        "collection": "advanced-ml",
+        "profile": "cv_engineer",
+        "query_chars": 152,
+        "query_preview": "deep-learning interview project heavy python pytorch computer vision deep learning numpy classification model ",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.2608,
+        "top5_mean_cosine": 0.1717,
+        "top15_mean_cosine": 0.1186,
+        "min_cosine_in_topk": 0.0559,
+        "distinct_source_docs_in_top15": 1,
+        "pages_in_top15": [
+          2,
+          4,
+          5,
+          8,
+          9,
+          11,
+          12,
+          16,
+          17,
+          18,
+          20
+        ]
+      },
+      {
+        "role": "computer-vision",
+        "collection": "advanced-ml",
+        "profile": "experienced_ai",
+        "query_chars": 212,
+        "query_preview": "computer-vision interview experienced python pytorch rag llm nlp machine learning information retrieval model ",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1488,
+        "top5_mean_cosine": 0.1062,
+        "top15_mean_cosine": 0.0799,
+        "min_cosine_in_topk": 0.0597,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          2,
+          3,
+          4,
+          5,
+          9,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      {
+        "role": "computer-vision",
+        "collection": "advanced-ml",
+        "profile": "entry_data",
+        "query_chars": 121,
+        "query_preview": "computer-vision interview entry level sql python pandas statistics regression regression classification sql py",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.3146,
+        "top5_mean_cosine": 0.1726,
+        "top15_mean_cosine": 0.0944,
+        "min_cosine_in_topk": 0.0423,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          2,
+          9,
+          10,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      {
+        "role": "computer-vision",
+        "collection": "advanced-ml",
+        "profile": "cv_engineer",
+        "query_chars": 154,
+        "query_preview": "computer-vision interview project heavy python pytorch computer vision deep learning numpy classification mode",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.136,
+        "top5_mean_cosine": 0.1122,
+        "top15_mean_cosine": 0.0818,
+        "min_cosine_in_topk": 0.0469,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          2,
+          4,
+          5,
+          9,
+          10,
+          11,
+          14,
+          16,
+          17,
+          18,
+          20
+        ]
+      },
+      {
+        "role": "nlp",
+        "collection": "ai-ml",
+        "profile": "experienced_ai",
+        "query_chars": 200,
+        "query_preview": "nlp interview experienced python pytorch rag llm nlp machine learning information retrieval model evaluation i",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1413,
+        "top5_mean_cosine": 0.0984,
+        "top15_mean_cosine": 0.0722,
+        "min_cosine_in_topk": 0.0502,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          4,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          16,
+          19
+        ]
+      },
+      {
+        "role": "nlp",
+        "collection": "ai-ml",
+        "profile": "entry_data",
+        "query_chars": 109,
+        "query_preview": "nlp interview entry level sql python pandas statistics regression regression classification sql python pandas",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1194,
+        "top5_mean_cosine": 0.0847,
+        "top15_mean_cosine": 0.0541,
+        "min_cosine_in_topk": 0.0173,
+        "distinct_source_docs_in_top15": 1,
+        "pages_in_top15": [
+          4,
+          6,
+          7,
+          9,
+          11,
+          12,
+          13,
+          16,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "nlp",
+        "collection": "ai-ml",
+        "profile": "cv_engineer",
+        "query_chars": 142,
+        "query_preview": "nlp interview project heavy python pytorch computer vision deep learning numpy classification model evaluation",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.0919,
+        "top5_mean_cosine": 0.0752,
+        "top15_mean_cosine": 0.0515,
+        "min_cosine_in_topk": 0.0322,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          3,
+          4,
+          7,
+          9,
+          10,
+          12,
+          13,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "data-engineer",
+        "collection": "data-science",
+        "profile": "experienced_ai",
+        "query_chars": 210,
+        "query_preview": "data-engineer interview experienced python pytorch rag llm nlp machine learning information retrieval model ev",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1325,
+        "top5_mean_cosine": 0.1167,
+        "top15_mean_cosine": 0.0897,
+        "min_cosine_in_topk": 0.064,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          4,
+          5,
+          7,
+          9,
+          10,
+          13,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "data-engineer",
+        "collection": "data-science",
+        "profile": "entry_data",
+        "query_chars": 119,
+        "query_preview": "data-engineer interview entry level sql python pandas statistics regression regression classification sql pyth",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1775,
+        "top5_mean_cosine": 0.1465,
+        "top15_mean_cosine": 0.1002,
+        "min_cosine_in_topk": 0.0533,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          5,
+          6,
+          7,
+          14,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "data-engineer",
+        "collection": "data-science",
+        "profile": "cv_engineer",
+        "query_chars": 152,
+        "query_preview": "data-engineer interview project heavy python pytorch computer vision deep learning numpy classification model ",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1601,
+        "top5_mean_cosine": 0.1213,
+        "top15_mean_cosine": 0.0898,
+        "min_cosine_in_topk": 0.0525,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          5,
+          6,
+          7,
+          9,
+          10,
+          17,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "data-analyst",
+        "collection": "data-science",
+        "profile": "experienced_ai",
+        "query_chars": 209,
+        "query_preview": "data-analyst interview experienced python pytorch rag llm nlp machine learning information retrieval model eva",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1325,
+        "top5_mean_cosine": 0.1167,
+        "top15_mean_cosine": 0.0897,
+        "min_cosine_in_topk": 0.064,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          4,
+          5,
+          7,
+          9,
+          10,
+          13,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "data-analyst",
+        "collection": "data-science",
+        "profile": "entry_data",
+        "query_chars": 118,
+        "query_preview": "data-analyst interview entry level sql python pandas statistics regression regression classification sql pytho",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1775,
+        "top5_mean_cosine": 0.1465,
+        "top15_mean_cosine": 0.1002,
+        "min_cosine_in_topk": 0.0533,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          5,
+          6,
+          7,
+          14,
+          19,
+          20
+        ]
+      },
+      {
+        "role": "data-analyst",
+        "collection": "data-science",
+        "profile": "cv_engineer",
+        "query_chars": 151,
+        "query_preview": "data-analyst interview project heavy python pytorch computer vision deep learning numpy classification model e",
+        "hits_returned": 15,
+        "fetch_k_requested": 15,
+        "top1_cosine": 0.1601,
+        "top5_mean_cosine": 0.1213,
+        "top15_mean_cosine": 0.0898,
+        "min_cosine_in_topk": 0.0525,
+        "distinct_source_docs_in_top15": 2,
+        "pages_in_top15": [
+          5,
+          6,
+          7,
+          9,
+          10,
+          17,
+          19,
+          20
+        ]
+      }
+    ],
+    "overall_top1_cosine_mean": 0.162,
+    "overall_top1_cosine_min": 0.0809,
+    "overall_top1_cosine_max": 0.3146
+  },
+  "sampling_loss": {
+    "explanation": "interview.py:163 discards the ranking: random.sample(top15, 5). Rank 1 and rank 15 are equally likely to be kept.",
+    "analytic_p_any_ranked_chunk_survives": 0.3333,
+    "monte_carlo_p_rank1_survives": 0.3412,
+    "monte_carlo_trials": 20000,
+    "effective_recall": {
+      "ai-ml::sentence": {
+        "recall_at_15_of_retriever": 1.0,
+        "p_survives_random_sample": 0.3333,
+        "effective_recall_reaching_prompt": 0.3333
+      },
+      "ai-ml::terms": {
+        "recall_at_15_of_retriever": 1.0,
+        "p_survives_random_sample": 0.3333,
+        "effective_recall_reaching_prompt": 0.3333
+      },
+      "data-science::sentence": {
+        "recall_at_15_of_retriever": 1.0,
+        "p_survives_random_sample": 0.3333,
+        "effective_recall_reaching_prompt": 0.3333
+      },
+      "data-science::terms": {
+        "recall_at_15_of_retriever": 1.0,
+        "p_survives_random_sample": 0.3333,
+        "effective_recall_reaching_prompt": 0.3333
+      },
+      "advanced-ml::sentence": {
+        "recall_at_15_of_retriever": 1.0,
+        "p_survives_random_sample": 0.3333,
+        "effective_recall_reaching_prompt": 0.3333
+      },
+      "advanced-ml::terms": {
+        "recall_at_15_of_retriever": 1.0,
+        "p_survives_random_sample": 0.3333,
+        "effective_recall_reaching_prompt": 0.3333
+      }
+    }
+  }
+}

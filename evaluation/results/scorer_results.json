@@ -1,0 +1,455 @@
+{
+  "meta": {
+    "generated_at": "2026-09-11T01:04:26",
+    "gemini": {
+      "available": true,
+      "model": "gemini-2.5-flash",
+      "error": null
+    },
+    "role": "ai-engineer",
+    "topic": "model evaluation",
+    "question": "You are applying model evaluation in a production system. What design decision would you make first and what metric would validate it? Include one concrete metric, system constraint, or edge case.",
+    "benchmark_frozen": true,
+    "caveat": "No human-labelled scores exist. MAE, RMSE, Pearson, Spearman and QWK against expert judgement are NOT computed."
+  },
+  "answers_used": {
+    "verbatim_question_copy": "You are applying model evaluation in a production system. What design decision would you make first and what metric would validate it? Include one concrete metric, system constraint, or edge case.",
+    "generic_nonanswer": "I do not know much about this topic, not sure, no idea really.",
+    "very_short_real": "Use precision and recall.",
+    "substantive_answer": "First I would decide the evaluation metric before touching the model, because the metric encodes the business tradeoff. For a fraud classifier the cost of a false negative dominates, so I would optimise recall at a fixed precision floor of 0.90 rather than accuracy, which is meaningless at 2 percent prevalence. The design decision is a held-out temporal split instead of a random split, since a random split leaks future information and inflated our offline AUC by 6 points. To validate it I would track precision at fixed recall on a rolling weekly window and alert on drift. The main failure mode is label delay: chargebacks arrive 30 days late, so the recent window looks artificially clean.",
+    "keyword_stuffed_nonanswer": "accuracy precision recall latency model evaluation pipeline training validation vector embedding retrieval monitoring deployment classification regression clustering feature metric architecture batch bias scaling testing tradeoff 42 percent because for example the data learning training model",
+    "fluent_but_wrong": "Model evaluation means you should always maximise accuracy, because accuracy is the only metric that matters in production systems. Precision and recall are academic ideas that do not apply once you deploy. You should train and test on the same data so the model sees every example, and a 99 percent training accuracy guarantees the system will work correctly for all future users without drift.",
+    "off_topic_fluent": "I really enjoy hiking in the mountains during the summer months because the weather is pleasant and the trails are quiet. Last year we walked for about 12 kilometres each day and camped near a lake, which was a wonderful experience for the whole family and something I would recommend to anyone who enjoys nature."
+  },
+  "ranked_sources": [
+    {
+      "rank": 1,
+      "document": "Machine Learning For Absolute Beginners.pdf",
+      "page": 31,
+      "score": 0.0667
+    },
+    {
+      "rank": 2,
+      "document": "Machine Learning For Absolute Beginners.pdf",
+      "page": 39,
+      "score": 0.0639
+    },
+    {
+      "rank": 3,
+      "document": "The Hundred-Page Machine Learning Book \u2014 Andriy Burkov.pdf",
+      "page": 48,
+      "score": 0.0616
+    },
+    {
+      "rank": 4,
+      "document": "Machine Learning For Absolute Beginners.pdf",
+      "page": 25,
+      "score": 0.0602
+    },
+    {
+      "rank": 5,
+      "document": "Machine Learning For Absolute Beginners.pdf",
+      "page": 12,
+      "score": 0.059
+    }
+  ],
+  "heuristic": {
+    "evaluator_label": "HEURISTIC",
+    "evaluator_field_returned": "heuristic",
+    "scores": {
+      "verbatim_question_copy": {
+        "score": 6,
+        "level": "off-topic",
+        "evaluator": "heuristic",
+        "dimension_scores": null,
+        "factual_errors": [],
+        "component_scores": {
+          "length": 0,
+          "relevance": 0,
+          "grounding": 0,
+          "technical": 0,
+          "specificity": 0
+        }
+      },
+      "generic_nonanswer": {
+        "score": 3,
+        "level": "thin",
+        "evaluator": "heuristic",
+        "dimension_scores": null,
+        "factual_errors": [],
+        "component_scores": {
+          "length": 22,
+          "relevance": 0,
+          "grounding": 0,
+          "technical": 0,
+          "specificity": 0
+        }
+      },
+      "very_short_real": {
+        "score": 0,
+        "level": "off-topic",
+        "evaluator": "heuristic",
+        "dimension_scores": null,
+        "factual_errors": [],
+        "component_scores": {
+          "length": 0,
+          "relevance": 0,
+          "grounding": 0,
+          "technical": 0,
+          "specificity": 0
+        }
+      },
+      "substantive_answer": {
+        "score": 70,
+        "level": "adequate",
+        "evaluator": "heuristic",
+        "dimension_scores": null,
+        "factual_errors": [],
+        "component_scores": {
+          "length": 100,
+          "relevance": 0,
+          "grounding": 100,
+          "technical": 100,
+          "specificity": 100
+        }
+      },
+      "keyword_stuffed_nonanswer": {
+        "score": 40,
+        "level": "developing",
+        "evaluator": "heuristic",
+        "dimension_scores": null,
+        "factual_errors": [],
+        "component_scores": {
+          "length": 52,
+          "relevance": 0,
+          "grounding": 100,
+          "technical": 100,
+          "specificity": 100
+        }
+      },
+      "fluent_but_wrong": {
+        "score": 70,
+        "level": "adequate",
+        "evaluator": "heuristic",
+        "dimension_scores": null,
+        "factual_errors": [],
+        "component_scores": {
+          "length": 98,
+          "relevance": 0,
+          "grounding": 100,
+          "technical": 100,
+          "specificity": 100
+        }
+      },
+      "off_topic_fluent": {
+        "score": 22,
+        "level": "off-topic",
+        "evaluator": "heuristic",
+        "dimension_scores": null,
+        "factual_errors": [],
+        "component_scores": {
+          "length": 92,
+          "relevance": 0,
+          "grounding": 0,
+          "technical": 0,
+          "specificity": 100
+        }
+      }
+    },
+    "behavioural_spec": {
+      "copy_paste_under_8": {
+        "rule": "A mirrored question must score below 8",
+        "answer_used": "verbatim_question_copy",
+        "score": 6,
+        "level": "off-topic",
+        "passes": true
+      },
+      "generic_capped_20": {
+        "rule": "Generic non-answers cap at 20",
+        "answer_used": "generic_nonanswer",
+        "score": 3,
+        "level": "thin",
+        "passes": true
+      },
+      "one_liner_capped_45": {
+        "rule": "A correct one-liner should not exceed 45",
+        "answer_used": "very_short_real",
+        "score": 0,
+        "level": "off-topic",
+        "passes": true
+      },
+      "substantive_scores_above_50": {
+        "rule": "A detailed, correct, metric-rich answer clears the developing band",
+        "answer_used": "substantive_answer",
+        "score": 70,
+        "level": "adequate",
+        "passes": true
+      },
+      "off_topic_scores_low": {
+        "rule": "Off-topic answers score low",
+        "answer_used": "off_topic_fluent",
+        "score": 22,
+        "level": "off-topic",
+        "passes": true
+      },
+      "wrong_below_correct": {
+        "rule": "A factually wrong answer must score strictly below the correct one",
+        "correct_score": 70,
+        "other_answer": "fluent_but_wrong",
+        "other_score": 70,
+        "margin": 0,
+        "evaluator_a": "heuristic",
+        "evaluator_b": "heuristic",
+        "comparable": true,
+        "passes": false,
+        "invalid_reason": null
+      },
+      "gibberish_below_correct": {
+        "rule": "Keyword-stuffed text must score strictly below the correct answer",
+        "correct_score": 70,
+        "other_answer": "keyword_stuffed_nonanswer",
+        "other_score": 40,
+        "margin": 30,
+        "evaluator_a": "heuristic",
+        "evaluator_b": "heuristic",
+        "comparable": true,
+        "passes": true,
+        "invalid_reason": null
+      },
+      "_summary": {
+        "checks": 7,
+        "passed": 6,
+        "excluded_evaluator_mismatch": 0,
+        "note": "Specification conformance, NOT an accuracy metric. Cross-evaluator comparisons are excluded, not counted."
+      }
+    },
+    "determinism": {
+      "verbatim_question_copy": {
+        "repeats": 20,
+        "distinct_scores": [
+          6
+        ],
+        "n_distinct": 1,
+        "stdev": 0.0,
+        "range": 0,
+        "deterministic": true
+      },
+      "generic_nonanswer": {
+        "repeats": 20,
+        "distinct_scores": [
+          3
+        ],
+        "n_distinct": 1,
+        "stdev": 0.0,
+        "range": 0,
+        "deterministic": true
+      },
+      "very_short_real": {
+        "repeats": 20,
+        "distinct_scores": [
+          0
+        ],
+        "n_distinct": 1,
+        "stdev": 0.0,
+        "range": 0,
+        "deterministic": true
+      },
+      "substantive_answer": {
+        "repeats": 20,
+        "distinct_scores": [
+          70
+        ],
+        "n_distinct": 1,
+        "stdev": 0.0,
+        "range": 0,
+        "deterministic": true
+      },
+      "keyword_stuffed_nonanswer": {
+        "repeats": 20,
+        "distinct_scores": [
+          40
+        ],
+        "n_distinct": 1,
+        "stdev": 0.0,
+        "range": 0,
+        "deterministic": true
+      },
+      "fluent_but_wrong": {
+        "repeats": 20,
+        "distinct_scores": [
+          70
+        ],
+        "n_distinct": 1,
+        "stdev": 0.0,
+        "range": 0,
+        "deterministic": true
+      },
+      "off_topic_fluent": {
+        "repeats": 20,
+        "distinct_scores": [
+          22
+        ],
+        "n_distinct": 1,
+        "stdev": 0.0,
+        "range": 0,
+        "deterministic": true
+      }
+    }
+  },
+  "component_ablation": {
+    "1_filler_only": {
+      "score": 15,
+      "delta_vs_previous": 15,
+      "level": "off-topic"
+    },
+    "2_plus_topic_terms": {
+      "score": 35,
+      "delta_vs_previous": 20,
+      "level": "developing"
+    },
+    "3_plus_technical_terms": {
+      "score": 55,
+      "delta_vs_previous": 20,
+      "level": "developing"
+    },
+    "4_plus_numeric_specificity": {
+      "score": 55,
+      "delta_vs_previous": 0,
+      "level": "developing"
+    },
+    "5_plus_grounding_terms": {
+      "score": 70,
+      "delta_vs_previous": 15,
+      "level": "adequate"
+    },
+    "_note": "Cumulative probes; deltas include interacting caps."
+  },
+  "pipeline_variance": {
+    "verbatim_question_copy": {
+      "after_fixed_topk": {
+        "trials": 20,
+        "min": 6,
+        "max": 6,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 1
+      },
+      "before_random_sample_regime": {
+        "trials": 200,
+        "min": 6,
+        "max": 6,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 3003
+      }
+    },
+    "generic_nonanswer": {
+      "after_fixed_topk": {
+        "trials": 20,
+        "min": 3,
+        "max": 3,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 1
+      },
+      "before_random_sample_regime": {
+        "trials": 200,
+        "min": 3,
+        "max": 3,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 3003
+      }
+    },
+    "very_short_real": {
+      "after_fixed_topk": {
+        "trials": 20,
+        "min": 0,
+        "max": 0,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 1
+      },
+      "before_random_sample_regime": {
+        "trials": 200,
+        "min": 0,
+        "max": 0,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 3003
+      }
+    },
+    "substantive_answer": {
+      "after_fixed_topk": {
+        "trials": 20,
+        "min": 70,
+        "max": 70,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 1
+      },
+      "before_random_sample_regime": {
+        "trials": 200,
+        "min": 22,
+        "max": 70,
+        "spread": 48,
+        "stdev": 6.086,
+        "reachable_chunk_sets": 3003
+      }
+    },
+    "keyword_stuffed_nonanswer": {
+      "after_fixed_topk": {
+        "trials": 20,
+        "min": 40,
+        "max": 40,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 1
+      },
+      "before_random_sample_regime": {
+        "trials": 200,
+        "min": 40,
+        "max": 40,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 3003
+      }
+    },
+    "fluent_but_wrong": {
+      "after_fixed_topk": {
+        "trials": 20,
+        "min": 70,
+        "max": 70,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 1
+      },
+      "before_random_sample_regime": {
+        "trials": 200,
+        "min": 60,
+        "max": 70,
+        "spread": 10,
+        "stdev": 0.927,
+        "reachable_chunk_sets": 3003
+      }
+    },
+    "off_topic_fluent": {
+      "after_fixed_topk": {
+        "trials": 20,
+        "min": 22,
+        "max": 22,
+        "spread": 0,
+        "stdev": 0.0,
+        "reachable_chunk_sets": 1
+      },
+      "before_random_sample_regime": {
+        "trials": 200,
+        "min": 22,
+        "max": 34,
+        "spread": 12,
+        "stdev": 5.839,
+        "reachable_chunk_sets": 3003
+      }
+    }
+  }
+}

@@ -64,7 +64,8 @@ def generate_pdf_report(summary: dict[str, Any], contact_email: str | None, cont
 
     insights  = summary.get("insights", {})
     questions = summary.get("questions", [])
-    avg       = round(float(insights.get("average_score", 0)))
+    _avg_raw  = insights.get("average_score")
+    avg       = round(float(_avg_raw)) if _avg_raw is not None else 0
     answered  = insights.get("questions_answered", 0)
     skipped   = insights.get("skipped_count", 0)
     rec       = insights.get("recommendation", "")

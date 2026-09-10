@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "generated_at": "2026-09-10T21:59:52",
+    "seed": 20260910,
+    "gemini_available": false,
+    "generator_under_test": "template_fallback",
+    "caveat": "Structural and diversity metrics only. Technical correctness, clarity, difficulty calibration and hallucination rate require expert human rating and are NOT reported."
+  },
+  "results": {
+    "questions_generated": 480,
+    "sessions_simulated": 96,
+    "grounding": {
+      "definition": "content words shared between the question text and the retrieved chunks, EXCLUDING the topic string and role label",
+      "questions_with_zero_grounded_words": 48,
+      "pct_with_zero_grounding": 10.0,
+      "mean_grounded_words": 2.177,
+      "max_grounded_words": 6
+    },
+    "duplicates": {
+      "exact_duplicate_questions": 305,
+      "exact_duplicate_rate_pct": 63.5,
+      "distinct_questions": 175,
+      "most_repeated": [
+        {
+          "text": "Suppose a candidate mentions python on their resume. What signals distinguish surface familiarity fr",
+          "count": 14
+        },
+        {
+          "text": "You are applying python in a production system. What design decision would you make first and what m",
+          "count": 14
+        },
+        {
+          "text": "What are the most common misconceptions about pytorch you've seen in interviews or on the job? Inclu",
+          "count": 13
+        },
+        {
+          "text": "You listed python as a strength. Walk through a real scenario where it mattered and what you'd do di",
+          "count": 13
+        },
+        {
+          "text": "You listed pytorch as a strength. Walk through a real scenario where it mattered and what you'd do d",
+          "count": 11
+        }
+      ]
+    },
+    "template_reuse": {
+      "distinct_template_signatures": 11,
+      "most_used_template": 75,
+      "mean_uses_per_template": 43.64
+    },
+    "topic_diversity": {
+      "distinct_topics_overall": 16,
+      "mean_duplicate_topics_per_session": 0,
+      "sessions_with_a_repeated_topic": 0
+    },
+    "difficulty_distribution": {
+      "intermediate": 416,
+      "foundational": 64
+    }
+  },
+  "sample_questions": [
+    "How would you evaluate whether a nlp-based solution is working well, and what failure modes would you expect? Include one concrete metric, system constraint, or edge case.",
+    "Suppose a candidate mentions information retrieval on their resume. What signals distinguish surface familiarity from practical depth? Include one concrete metric, system constraint, or edge case.",
+    "How would you evaluate whether a llm-based solution is working well, and what failure modes would you expect? Include one concrete metric, system constraint, or edge case.",
+    "What are the most common misconceptions about pytorch you've seen in interviews or on the job? Include one concrete metric, system constraint, or edge case.",
+    "Connect python to the Machine Learning Engineer role. What design decision would you make first, and what evidence would justify it? Include one concrete metric, system constraint, or edge case.",
+    "Walk me through how you would get started with sql on a new project.",
+    "For a Machine Learning Engineer role, explain regression using an example from your own work. What tradeoffs would you watch for?",
+    "Suppose a candidate mentions python on their resume. What signals distinguish surface familiarity from practical depth? Include one concrete metric, system constraint, or edge case.",
+    "You listed statistics as a strength. Walk through a real scenario where it mattered and what you'd do differently now. Include one concrete metric, system constraint, or edge case.",
+    "What are the most common misconceptions about pandas you've seen in interviews or on the job? Include one concrete metric, system constraint, or edge case.",
+    "You listed numpy as a strength. Walk through a real scenario where it mattered and what you'd do differently now. Include one concrete metric, system constraint, or edge case.",
+    "What are the most common misconceptions about classification you've seen in interviews or on the job? Include one concrete metric, system constraint, or edge case.",
+    "How would you evaluate whether a pytorch-based solution is working well, and what failure modes would you expect? Include one concrete metric, system constraint, or edge case.",
+    "Suppose a candidate mentions python on their resume. What signals distinguish surface familiarity from practical depth? Include one concrete metric, system constraint, or edge case.",
+    "What are the most common misconceptions about feature engineering you've seen in interviews or on the job? Include one concrete metric, system constraint, or edge case."
+  ]
+}

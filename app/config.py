@@ -5,6 +5,16 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 
+# Load .env BEFORE the Settings dataclass body executes. Dataclass field
+# defaults are evaluated at class-definition time, so any os.getenv() below
+# would otherwise read the environment before .env had been applied.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(ROOT_DIR / ".env")
+except ImportError:  # python-dotenv is optional; real env vars still work
+    pass
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -15,7 +25,7 @@ class Settings:
     chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "160"))
     top_k: int = int(os.getenv("TOP_K", "5"))
     max_document_mb: int = int(os.getenv("MAX_DOCUMENT_MB", "25"))
-    max_pages_per_document: int = int(os.getenv("MAX_PAGES_PER_DOCUMENT", "20"))
+    max_pages_per_document: int = int(os.getenv("MAX_PAGES_PER_DOCUMENT", "60"))
 
 
 settings = Settings()

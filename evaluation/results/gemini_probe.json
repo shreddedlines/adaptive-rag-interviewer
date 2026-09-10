@@ -1,0 +1,58 @@
+{
+  "verbatim_question_copy": {
+    "score": 6,
+    "level": "off-topic",
+    "evaluator": "heuristic",
+    "dimension_scores": {},
+    "factual_errors": [],
+    "feedback": "Your answer appears to repeat the question. Please provide an original response."
+  },
+  "generic_nonanswer": {
+    "score": 3,
+    "level": "thin",
+    "evaluator": "heuristic",
+    "dimension_scores": {},
+    "factual_errors": [],
+    "feedback": "Too short to evaluate deeply \u2014 specifics, examples, and tradeoffs needed."
+  },
+  "very_short_real": {
+    "score": 0,
+    "level": "off-topic",
+    "evaluator": "heuristic",
+    "dimension_scores": {},
+    "factual_errors": [],
+    "feedback": "Your answer appears to repeat the question. Please provide an original response."
+  },
+  "substantive_answer": {
+    "score": 70,
+    "level": "adequate",
+    "evaluator": "heuristic",
+    "dimension_scores": {},
+    "factual_errors": [],
+    "feedback": "Relevant answer; sharper examples and evaluation criteria would strengthen it."
+  },
+  "keyword_stuffed_nonanswer": {
+    "score": 40,
+    "level": "developing",
+    "evaluator": "heuristic",
+    "dimension_scores": {},
+    "factual_errors": [],
+    "feedback": "Partially relevant, but needs more concrete reasoning and source connection."
+  },
+  "fluent_but_wrong": {
+    "score": 70,
+    "level": "adequate",
+    "evaluator": "heuristic",
+    "dimension_scores": {},
+    "factual_errors": [],
+    "feedback": "Relevant answer; sharper examples and evaluation criteria would strengthen it."
+  },
+  "off_topic_fluent": {
+    "score": 22,
+    "level": "off-topic",
+    "evaluator": "heuristic",
+    "dimension_scores": {},
+    "factual_errors": [],
+    "feedback": "The answer does not meaningfully address the question or context."
+  }
+}

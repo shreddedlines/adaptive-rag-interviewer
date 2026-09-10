@@ -237,18 +237,28 @@ function drawRadarChart(){
   const W   = canvas.width, H = canvas.height;
   const cx  = W/2, cy = H/2;
   const R   = Math.min(cx,cy) - 44;
-  const n   = 5;
-  const step= (2*Math.PI)/n;
-  const axes= ["Relevance","Technical","Grounding","Specificity","Length"];
-  const keys= ["relevance","technical","grounding","specificity","length"];
+  // Axis set depends on which evaluator produced the scores.
+  // Gemini returns real per-dimension judgements; the heuristic returns its own
+  // five surface-feature components. Detect from the first scored question.
+  const GEMINI_KEYS = ["correctness","relevance","completeness","reasoning","grounding"];
+  const GEMINI_AXES = ["Correctness","Relevance","Completeness","Reasoning","Grounding"];
+  const HEUR_KEYS   = ["relevance","technical","grounding","specificity","length"];
+  const HEUR_AXES   = ["Relevance","Technical","Grounding","Specificity","Length"];
+
+  const scored = state.summary.questions.filter(q => !q.skipped && q.analysis?.component_scores);
+  const isGeminiRadar = scored.some(q => q.analysis.evaluator === "gemini"
+                                      && "correctness" in q.analysis.component_scores);
+  const keys = isGeminiRadar ? GEMINI_KEYS : HEUR_KEYS;
+  const axes = isGeminiRadar ? GEMINI_AXES : HEUR_AXES;
+  const n    = keys.length;
+  const step = (2*Math.PI)/n;
 
   // Average component scores across all non-skipped questions
-  const totals = {relevance:0,technical:0,grounding:0,specificity:0,length:0};
+  const totals = {};
+  keys.forEach(k => totals[k] = 0);
   let count = 0;
-  for(const q of state.summary.questions){
-    if(q.skipped) continue;
-    const cs = q.analysis?.component_scores;
-    if(!cs) continue;
+  for(const q of scored){
+    const cs = q.analysis.component_scores;
     keys.forEach(k=>{ totals[k]+=(cs[k]||0); });
     count++;
   }

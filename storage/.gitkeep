@@ -1,2 +1,0 @@
-# This file ensures the storage directory is tracked by git.
-# The actual database and uploaded files are excluded via .gitignore.

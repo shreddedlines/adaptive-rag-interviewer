@@ -96,7 +96,7 @@ async function load(){
 }
 function renderStats(){
   const total=rows.length;
-  const done=rows.filter(r=>r.status==='completed').length;
+  const done=rows.filter(r=>r.status==='complete').length;
   const withScore=rows.filter(r=>r.avg_score!=null);
   const avgScore=withScore.length?Math.round(withScore.reduce((a,r)=>a+r.avg_score,0)/withScore.length):null;
   const strong=withScore.filter(r=>r.avg_score>=75).length;
@@ -130,7 +130,7 @@ function renderTable(data){
     <td>${scorePill(r.avg_score)}</td>
     <td style="color:#64748b;font-size:12px">${r.answered||0} answered &middot; ${r.skipped||0} skipped</td>
     <td style="color:#64748b;font-size:12px">${fmt(r.created_at)}</td>
-    <td>${r.status==='completed'
+    <td>${r.status==='complete'
       ?`<a class="pdf-link" href="/api/sessions/${r.id}/export" target="_blank" download>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-7 9H5v2h14v-2h-7z"/></svg>PDF</a>`
       :'<span style="color:#94a3b8;font-size:12px">In progress</span>'}

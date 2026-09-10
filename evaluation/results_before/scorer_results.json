@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "generated_at": "2026-09-10T21:58:33",
+    "gemini_available": false,
+    "evaluator_under_test": "heuristic",
+    "role": "ai-engineer",
+    "topic": "model evaluation",
+    "question": "You are applying model evaluation in a production system. What design decision would you make first and what metric would validate it? Include one concrete metric, system constraint, or edge case.",
+    "caveat": "No human-labelled scores exist in this repository. MAE, RMSE, Pearson and Spearman against expert judgement are NOT computed and MUST NOT be claimed."
+  },
+  "answers_used": {
+    "verbatim_question_copy": "You are applying model evaluation in a production system. What design decision would you make first and what metric would validate it? Include one concrete metric, system constraint, or edge case.",
+    "generic_nonanswer": "I do not know much about this topic, not sure, no idea really.",
+    "very_short_real": "Use precision and recall.",
+    "substantive_answer": "First I would decide the evaluation metric before touching the model, because the metric encodes the business tradeoff. For a fraud classifier the cost of a false negative dominates, so I would optimise recall at a fixed precision floor of 0.90 rather than accuracy, which is meaningless at 2 percent prevalence. The design decision is a held-out temporal split instead of a random split, since a random split leaks future information and inflated our offline AUC by 6 points. To validate it I would track precision at fixed recall on a rolling weekly window and alert on drift. The main failure mode is label delay: chargebacks arrive 30 days late, so the recent window looks artificially clean.",
+    "keyword_stuffed_nonanswer": "accuracy precision recall latency model evaluation pipeline training validation vector embedding retrieval monitoring deployment classification regression clustering feature metric architecture batch bias scaling testing tradeoff 42 percent because for example the data learning training model",
+    "fluent_but_wrong": "Model evaluation means you should always maximise accuracy, because accuracy is the only metric that matters in production systems. Precision and recall are academic ideas that do not apply once you deploy. You should train and test on the same data so the model sees every example, and a 99 percent training accuracy guarantees the system will work correctly for all future users without drift.",
+    "off_topic_fluent": "I really enjoy hiking in the mountains during the summer months because the weather is pleasant and the trails are quiet. Last year we walked for about 12 kilometres each day and camped near a lake, which was a wonderful experience for the whole family and something I would recommend to anyone who enjoys nature."
+  },
+  "determinism": {
+    "verbatim_question_copy": {
+      "repeats": 20,
+      "distinct_scores": [
+        6
+      ],
+      "deterministic": true
+    },
+    "generic_nonanswer": {
+      "repeats": 20,
+      "distinct_scores": [
+        8
+      ],
+      "deterministic": true
+    },
+    "very_short_real": {
+      "repeats": 20,
+      "distinct_scores": [
+        0
+      ],
+      "deterministic": true
+    },
+    "substantive_answer": {
+      "repeats": 20,
+      "distinct_scores": [
+        70
+      ],
+      "deterministic": true
+    },
+    "keyword_stuffed_nonanswer": {
+      "repeats": 20,
+      "distinct_scores": [
+        40
+      ],
+      "deterministic": true
+    },
+    "fluent_but_wrong": {
+      "repeats": 20,
+      "distinct_scores": [
+        70
+      ],
+      "deterministic": true
+    },
+    "off_topic_fluent": {
+      "repeats": 20,
+      "distinct_scores": [
+        22
+      ],
+      "deterministic": true
+    }
+  },
+  "pipeline_variance": {
+    "verbatim_question_copy": {
+      "trials": 200,
+      "min": 6,
+      "max": 6,
+      "spread": 0,
+      "mean": 6,
+      "stdev": 0.0,
+      "distinct_values": 1
+    },
+    "generic_nonanswer": {
+      "trials": 200,
+      "min": 3,
+      "max": 8,
+      "spread": 5,
+      "mean": 4.72,
+      "stdev": 2.38,
+      "distinct_values": 2
+    },
+    "very_short_real": {
+      "trials": 200,
+      "min": 0,
+      "max": 0,
+      "spread": 0,
+      "mean": 0,
+      "stdev": 0.0,
+      "distinct_values": 1
+    },
+    "substantive_answer": {
+      "trials": 200,
+      "min": 55,
+      "max": 70,
+      "spread": 15,
+      "mean": 68.83,
+      "stdev": 2.74,
+      "distinct_values": 4
+    },
+    "keyword_stuffed_nonanswer": {
+      "trials": 200,
+      "min": 40,
+      "max": 40,
+      "spread": 0,
+      "mean": 40,
+      "stdev": 0.0,
+      "distinct_values": 1
+    },
+    "fluent_but_wrong": {
+      "trials": 200,
+      "min": 70,
+      "max": 70,
+      "spread": 0,
+      "mean": 70,
+      "stdev": 0.0,
+      "distinct_values": 1
+    },
+    "off_topic_fluent": {
+      "trials": 200,
+      "min": 22,
+      "max": 34,
+      "spread": 12,
+      "mean": 25.54,
+      "stdev": 5.47,
+      "distinct_values": 2
+    }
+  },
+  "behavioural_spec": {
+    "copy_paste_under_8": {
+      "rule": "gemini_eval.py:73 rule and interview.py:372 guard: an answer that mirrors the question must score below 8",
+      "answer_used": "verbatim_question_copy",
+      "score": 6,
+      "level": "off-topic",
+      "passes": true
+    },
+    "generic_capped_20": {
+      "rule": "interview.py:405 \u2014 GENERIC_PHRASES caps the score at 20",
+      "answer_used": "generic_nonanswer",
+      "score": 8,
+      "level": "thin",
+      "passes": true
+    },
+    "one_liner_capped_45": {
+      "rule": "gemini_eval.py:74 rule / interview.py:407-408 short-answer caps",
+      "answer_used": "very_short_real",
+      "score": 0,
+      "level": "off-topic",
+      "passes": true
+    },
+    "substantive_scores_above_50": {
+      "rule": "A detailed, metric-rich, on-topic answer should clear the 'developing' band",
+      "answer_used": "substantive_answer",
+      "score": 70,
+      "level": "adequate",
+      "passes": true
+    },
+    "off_topic_scores_low": {
+      "rule": "interview.py:408 \u2014 no topic overlap and no grounding caps at 22",
+      "answer_used": "off_topic_fluent",
+      "score": 22,
+      "level": "off-topic",
+      "passes": true
+    },
+    "_summary": {
+      "checks": 5,
+      "passed": 5,
+      "note": "This is a specification-conformance count, NOT an accuracy metric."
+    }
+  },
+  "component_ablation": {
+    "1_filler_only": {
+      "score": 15,
+      "delta_vs_previous": 15,
+      "component_scores": {
+        "length": 100,
+        "relevance": 0,
+        "grounding": 0,
+        "technical": 0,
+        "specificity": 0
+      },
+      "level": "off-topic",
+      "words": 60
+    },
+    "2_plus_topic_terms": {
+      "score": 30,
+      "delta_vs_previous": 15,
+      "component_scores": {
+        "length": 100,
+        "relevance": 0,
+        "grounding": 20,
+        "technical": 67,
+        "specificity": 0
+      },
+      "level": "off-topic",
+      "words": 62
+    },
+    "3_plus_technical_terms": {
+      "score": 50,
+      "delta_vs_previous": 20,
+      "component_scores": {
+        "length": 100,
+        "relevance": 0,
+        "grounding": 20,
+        "technical": 100,
+        "specificity": 100
+      },
+      "level": "developing",
+      "words": 67
+    },
+    "4_plus_numeric_specificity": {
+      "score": 50,
+      "delta_vs_previous": 0,
+      "component_scores": {
+        "length": 100,
+        "relevance": 0,
+        "grounding": 20,
+        "technical": 100,
+        "specificity": 100
+      },
+      "level": "developing",
+      "words": 69
+    },
+    "5_plus_grounding_terms": {
+      "score": 70,
+      "delta_vs_previous": 20,
+      "component_scores": {
+        "length": 100,
+        "relevance": 0,
+        "grounding": 100,
+        "technical": 100,
+        "specificity": 100
+      },
+      "level": "adequate",
+      "words": 81
+    },
+    "_note": "Probes are cumulative. Deltas reflect both the component weight and the interacting anti-gaming caps at interview.py:405-410."
+  },
+  "hint_penalty": {
+    "score_without_hint": 70,
+    "score_with_hint": 60,
+    "cap_enforced_at_60": true,
+    "rule": "interview.py:410 \u2014 hint_used caps the score at 60"
+  },
+  "gaming_probe": {
+    "keyword_stuffed_nonanswer": {
+      "score": 40,
+      "level": "developing",
+      "component_scores": {
+        "length": 52,
+        "relevance": 0,
+        "grounding": 100,
+        "technical": 100,
+        "specificity": 100
+      }
+    },
+    "substantive_answer": {
+      "score": 70,
+      "level": "adequate",
+      "component_scores": {
+        "length": 100,
+        "relevance": 0,
+        "grounding": 100,
+        "technical": 100,
+        "specificity": 100
+      }
+    },
+    "fluent_but_factually_wrong": {
+      "score": 70,
+      "level": "adequate",
+      "component_scores": {
+        "length": 98,
+        "relevance": 0,
+        "grounding": 100,
+        "technical": 100,
+        "specificity": 100
+      }
+    }
+  }
+}

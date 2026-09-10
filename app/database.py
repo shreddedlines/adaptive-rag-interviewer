@@ -52,10 +52,14 @@ def init_db() -> None:
                 hint_used INTEGER DEFAULT 0,
                 skipped INTEGER DEFAULT 0,
                 time_taken_seconds INTEGER,
+                question_meta TEXT,
                 created_at TEXT NOT NULL,
                 answered_at TEXT,
                 FOREIGN KEY(session_id) REFERENCES sessions(id)
             );
+
+            CREATE INDEX IF NOT EXISTS idx_questions_session
+                ON questions(session_id);
             """
         )
         # Safely migrate existing databases — add new columns if missing
@@ -63,6 +67,7 @@ def init_db() -> None:
             ("hint_used",           "INTEGER DEFAULT 0"),
             ("skipped",             "INTEGER DEFAULT 0"),
             ("time_taken_seconds",  "INTEGER"),
+            ("question_meta",       "TEXT"),
         ])
         _safe_add_columns(conn, "sessions", [
             ("contact_email", "TEXT"),
